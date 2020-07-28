@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import Topbar from "../Components/Topbar";
 import styled from "styled-components";
+import Footer from "../Components/Footer";
 
 const CardImage = styled.img`
   width: 100%;
@@ -64,6 +65,7 @@ function Drug() {
           })}
         </div>
       </Container>
+      <Footer></Footer>
     </div>
   );
 }

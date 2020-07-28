@@ -1,6 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { Container, Carousel } from "react-bootstrap";
 import Topbar from "../Components/Topbar";
+import styled from "styled-components";
+import commaNumber from "comma-number";
+import Footer from "../Components/Footer";
+
+const CardCovid = styled.div`
+  width: 30%;
+  background-color: ${(props) => props.bg};
+  color: ${(props) => props.color};
+  height: 6rem;
+  padding-top: 1rem;
+  text-align: center;
+  border-radius: 10px;
+`;
+
+const TitleCardCovid = styled.div`
+  width: 100%;
+  background-color: ${(props) => props.bg};
+  color: ${(props) => props.color};
+  height: 3rem;
+  padding-top: 0.6rem;
+  border-radius: 0 0 10px 10px;
+`;
 
 function Home() {
   const [newsList, setNewsList] = useState([]);
@@ -15,6 +37,8 @@ function Home() {
     NewRecovered: 134985,
     TotalRecovered: 9396854,
   });
+
+  const [allResult, setAllResult] = useState([]);
 
   const handleSelect = (selectedIndex, e) => {
     setIndex(selectedIndex);
@@ -58,6 +82,7 @@ function Home() {
     fetch("https://api.covid19api.com/summary", requestOptions)
       .then((response) => response.json())
       .then((result) => {
+        setAllResult(result.Countries);
         setDataCovid(result.Global);
       })
       .catch((error) => console.log("error", error));
@@ -67,7 +92,7 @@ function Home() {
     <div>
       <Topbar></Topbar>
       <Container>
-        <Carousel activeIndex={index} onSelect={handleSelect}>
+        <Carousel className="mt-2" activeIndex={index} onSelect={handleSelect}>
           {newsList.slice(0, 5).map((data, index) => {
             return (
               <Carousel.Item key={index}>
@@ -93,18 +118,60 @@ function Home() {
         <hr className="mt-3" />
         <h3>Coronavirus Information</h3>
         <div className="row">
-          <div className="card w-100 p-2">
-            <h5>Data Global</h5>
+          <div className="card w-100 p-2 pb-3">
+            <h5 className="text-center mt-2">Data Global</h5>
+            <select
+              onChange={(e) => {
+                let temp = allResult.filter(
+                  (data) => data.CountryCode === e.target.value
+                )[0];
+
+                setDataCovid(temp);
+              }}
+              className="form-control"
+            >
+              <option value="">Select Country</option>
+              {allResult.map((data) => {
+                return (
+                  <option key={data.CountryCode} value={data.CountryCode}>
+                    {data.Country}
+                  </option>
+                );
+              })}
+            </select>
             <hr />
-            <div>New Confirm : {dataCovid.NewConfirmed}</div>
-            <div>Total Confirm : {dataCovid.TotalConfirmed}</div>
-            <div>New Deaths : {dataCovid.NewDeaths}</div>
-            <div>Total Deaths : {dataCovid.TotalDeaths}</div>
-            <div>New Recovered : {dataCovid.NewRecovered}</div>
-            <div>Total Recovered : {dataCovid.TotalRecovered}</div>
+            <div className="d-flex justify-content-between">
+              {console.log(dataCovid)}
+              <CardCovid bg="#fff5f5" color="#e53e3e">
+                <h4>{commaNumber(dataCovid.TotalConfirmed)}</h4>
+                <TitleCardCovid bg="#fed7d7" color="#e53e3e">
+                  <h5>Total Confirmed</h5>
+                </TitleCardCovid>
+              </CardCovid>
+              <CardCovid bg="#f0fff4" color="#38a169">
+                <h4>{commaNumber(dataCovid.TotalRecovered)}</h4>
+                <TitleCardCovid bg="#c6f6d5" color="#38a169">
+                  <h5>Total Recovered</h5>
+                </TitleCardCovid>
+              </CardCovid>
+              <CardCovid bg="#edf2f7" color="#718096">
+                <h4>{commaNumber(dataCovid.TotalDeaths)}</h4>
+                <TitleCardCovid bg="#e2e8f0" color="#718096">
+                  <h5>Total Deaths</h5>
+                </TitleCardCovid>
+              </CardCovid>
+            </div>
           </div>
         </div>
       </Container>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <Footer></Footer>
     </div>
   );
 }
